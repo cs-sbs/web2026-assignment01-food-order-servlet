@@ -1,11 +1,14 @@
 #!/bin/bash
 
 score=0
+failed=0
 
 run_test () {
-  bash $1
+  bash "$1"
   if [ $? -eq 0 ]; then
     score=$((score+10))
+  else
+    failed=$((failed+1))
   fi
 }
 
@@ -23,3 +26,7 @@ run_test src/test/test10_html_exist.sh
 echo "================================="
 echo "TOTAL SCORE: $score / 100"
 echo "================================="
+
+if [ $failed -ne 0 ]; then
+  exit 1
+fi

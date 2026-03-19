@@ -1,10 +1,14 @@
 #!/bin/bash
 
+set -euo pipefail
 BASE_URL="http://localhost:8080"
 
-response=$(curl -s "$BASE_URL/menu?name=NotExistFood")
+tmp="$(mktemp)"
+status=$(curl -s -o "$tmp" -w "%{http_code}" "$BASE_URL/menu?name=NotExistFood")
+body="$(cat "$tmp")"
+rm -f "$tmp"
 
-if [[ "$response" == *"not"* ]] || [[ "$response" == *"No"* ]]; then
+if [[ "$status" == "200" ]] && { [[ "$body" == *"No"* ]] || [[ "$body" == *"not"* ]]; }; then
   echo "PASS: empty search handled"
   exit 0
 else

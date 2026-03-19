@@ -1,13 +1,19 @@
 #!/bin/bash
 
+set -euo pipefail
 BASE_URL="http://localhost:8080"
 
-response=$(curl -s -X POST $BASE_URL/order \
--d "customer=Alice" \
--d "food=Burger" \
--d "quantity=abc")
+tmp="$(mktemp)"
+status=$(curl -s -o "$tmp" -w "%{http_code}" -X POST $BASE_URL/order \
+  -d "customer=Alice" \
+  -d "food=Burger" \
+  -d "quantity=abc")
+body="$(cat "$tmp")"
+rm -f "$tmp"
 
-if [[ "$response" == *"Error"* ]] || [[ "$response" == *"invalid"* ]]; then
+if { [[ "$status" == "200" ]] || [[ "$status" == "400" ]]; } \
+   && { [[ "$body" == *"Error"* ]] || [[ "$body" == *"invalid"* ]]; } \
+   && [[ "$status" != "404" ]]; then
   echo "PASS: invalid quantity handled"
   exit 0
 else

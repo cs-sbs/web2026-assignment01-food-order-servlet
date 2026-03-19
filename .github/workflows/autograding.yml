@@ -29,6 +29,7 @@ jobs:
             fi
             sleep 1
           done
+          curl -sSf http://localhost:8080/ >/dev/null
 
       - name: Run Tests
         run: |
